@@ -1,0 +1,42 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ChatMessageで使われるroleを定義
+enum ChatRole {
+  user
+  assistant
+  system
+}
+
+model ChatSession {
+  id        String      @id @default(cuid())
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  messages  ChatMessage[]
+}
+
+model ChatMessage {
+  id          String      @id @default(cuid())
+  role        ChatRole    // Enumを使用
+  content     String      @db.Text
+  chatSession ChatSession @relation(fields: [chatId], references: [id])
+  chatId      String
+  createdAt   DateTime    @default(now()) // timestampを削除
+  updatedAt   DateTime    @updatedAt
+}
+
+model Env {
+  id                String    @id @default(cuid())
+  elasticsearchURL  String    
+  BASICAuthUser     String
+  BASICAuthPasswd   String
+  APIServerURL      String
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}                                                                               
